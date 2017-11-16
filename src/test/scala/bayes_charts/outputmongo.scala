@@ -19,7 +19,7 @@ object outputmongo {
    // val data = sc.parallelize(List(("Tom", "31"), ("Jack", "22"), ("Mary", "25")))
 
     val config = new Configuration()
-    val sURI =format("mongodb://%s:%s@%s:%d/%s", "bigdata", "bre5Uc#yu_hu", "10.11.255.122", 27017, "cr_data.finance.juchao.item")
+    val sURI =format("mongodb://%s:%s@%s:%d/%s", "bigdata", "bre5Uc#yu_hu", "10.11.255.122", 27017, "cr_data.juchao_tables")
 
     config.set("mongo.input.uri", sURI)
 
@@ -30,10 +30,11 @@ object outputmongo {
 
    // config.set("mongo.output.uri", "mongodb://spider:Serwe-8dfgre@120.26.41.22:27017/cr_data.table_external_info")
     //config.set("mongo.job.input.format", "com.mongodb.hadoop.BSONFileInputFormat");
-  config.set("mongo.input.query", "$or: [ {'type': '年度报告'},{'type': '半年度报告'}]")
+  config.set("mongo.input.query", "$or: [ {'state': 0},{'state': 2}]")
     //config.set("mongo.input.query", "{[$and:{'state':4}]}")
    //config.set("mongo.input.query","{'state':1}")
-    config.set("mongo.input.fields", """{'stock_name':1,'stock_code':1,'type':1}""")
+   config.set("mongo.input.fields", """{'_id':1,'title':1,'data':1}""")
+    //config.set("mongo.input.fields", """{'src_id':1,'title':1,'type':1,'stock_name':1,'stock_code':1,'industry':1,'time':1}""")
     //config.set("mongo.input.fields", """{'product_1':1}""")
     val documentRDD = sc.newAPIHadoopRDD(
       config,
@@ -47,7 +48,7 @@ object outputmongo {
     config)*/
     //print( bsonRDD.count()+"---------------------------------------------------------")
     
-    documentRDD.saveAsTextFile("/user/yzsun/10-month/finance.juchao.item_data/finance.juchao.item_all_addtype_")
+    documentRDD.saveAsTextFile("/user/yzsun/11-15-pushData/juchao_state_data1"+System.currentTimeMillis())
     //    RDD data is a KV pair,so it can use saveAsNewAPIHadoopFile
     //rdd.saveAsNewAPIHadoopFile("file:///bogus", classOf[Any], classOf[Any], classOf[com.mongodb.hadoop.MongoOutputFormat[Any, Any]], config)
       sc.stop()
