@@ -1,35 +1,44 @@
 package pushIndex
-import java.util  
-  
 import org.apache.solr.client.solrj.beans.Field  
 import org.apache.solr.client.solrj.impl.HttpSolrClient  
 import org.apache.spark.rdd.RDD  
 import org.apache.spark.{SparkConf, SparkContext}  
-  
+import java.util  
 import scala.annotation.meta.field  
+import org.apache.http.impl.client.SystemDefaultHttpClient
+import scala.collection.mutable.ArrayBuffer
 case class Record(  
-                   @(Field@field)("rowkey")     rowkey:String,  
-                   @(Field@field)("title")  title:String,  
-                   @(Field@field)("content") content:String,  
-                   @(Field@field)("isdel") isdel:String,  
-                   @(Field@field)("t1") t1:String,  
-                   @(Field@field)("t2")t2:String,  
-                   @(Field@field)("t3")t3:String,  
-                   @(Field@field)("dtime") dtime:String  
-  
-  
+                //(table_id+","+table_title+","+table_data_hash+","+table_row_title+","+table_column_title+","+table_source)
+                    @(Field@field)("id") id:String,
+                   @(Field@field)("table_title") table_title:String,
+                   @(Field@field)("table_data_hash")  table_data_hash:String,  
+                   @(Field@field)("table_row_title") table_row_title:String,  
+                   @(Field@field)("table_column_title") table_column_title:String,  
+                   @(Field@field)("table_source") table_source:String 
+                  /* @(Field@field)("table_id") table_id:String,
+                   @(Field@field)("id") id:String,
+                   @(Field@field)("src_id")  src_id:String,  
+                   @(Field@field)("title") title:String,  
+                   @(Field@field)("type")$type:String,  
+                   @(Field@field)("company") company:String,  
+                   @(Field@field)("stockcode")stockcode:String,
+                   @(Field@field)("industry_name") industry_name:String,
+                   @(Field@field)("time") time:String*/
+                  
                  )  
 object SparkIndex  {
   //solr客户端  
-  val client=new  HttpSolrClient("http://192.168.1.188:8984/solr/monitor");  
+  val httpClient = new SystemDefaultHttpClient();
+val client = new HttpSolrClient("http://10.1.1.248:9081/solr/core_table", httpClient);
+  //val client= new HttpSolrClient("http://10.1.1.248:9081/solr/fin_report");  
   //批提交的条数  
   val batchCount=10000;  
   
-  def main2(args: Array[String]) {  
+/*  def main(args: Array[String]) {  
   
-    val d1=new Record("row1","title","content","1","01","57","58","3");  
-    val d2=new Record("row2","title","content","1","01","57","58","45");  
-    val d3=new Record("row3","title","content","1","01","57","58",null);  
+    val d1=new Record("row1","title","content","1","01","57");  
+    val d2=new Record("row2","title","content","1","01","57");  
+    val d3=new Record("row3","title","content","1","01",null);  
     client.addBean(d1);  
     client.addBean(d2)  
     client.addBean(d3)  
@@ -37,7 +46,7 @@ object SparkIndex  {
     println("提交成功！")  
   
   
-  }  
+  } */ 
   
   
   /*** 
@@ -78,7 +87,7 @@ object SparkIndex  {
     */  
   def indexLineToModel(line:String,datas:util.ArrayList[Record]): Unit ={  
     //数组数据清洗转换  
-    val fields=line.split("\1",-1).map(field =>etl_field(field))  
+    val fields=line.split(",").map(fields=>fields.trim())//.map(field =>etl_field(field))  
     //将清洗完后的数组映射成Tuple类型  
     val tuple=buildTuble(fields)  
     //将Tuple转换成Bean类型  
@@ -95,9 +104,9 @@ object SparkIndex  {
     * @param array field集合数组 
     * @return tuple集合 
     */  
-  def buildTuble(array: Array[String]):(String, String, String, String, String, String, String, String)={  
+  def buildTuble(array: Array[String]):(String, String,String, String, String, String )={  
      array match {  
-       case Array(s1, s2, s3, s4, s5, s6, s7, s8) => (s1, s2, s3, s4, s5, s6, s7,s8)  
+       case Array(s1, s2, s3, s4, s5, s6) => (s1, s2, s3, s4, s5, s6)  
      }  
   }  
   
@@ -112,7 +121,7 @@ object SparkIndex  {
     */  
   def etl_field(field:String):String={  
     field match {  
-      case "" => null  
+      case "" => "aaa"  
       case _ => field  
     }  
   }  
@@ -130,24 +139,107 @@ object SparkIndex  {
   
   def main(args: Array[String]) {  
     //根据条件删除一些数据  
-    deleteSolrByQuery("t1:03")  
+    //deleteSolrByQuery("t1:03")  
     //远程提交时，需要提交打包后的jar  
-    val jarPath = "target\\spark-build-index-1.0-SNAPSHOT.jar";  
+    //val jarPath = "target\\spark-build-index-1.0-SNAPSHOT.jar";  
     //远程提交时，伪装成相关的hadoop用户，否则，可能没有权限访问hdfs系统  
-    System.setProperty("user.name", "webmaster");  
+    //System.setProperty("user.name", "webmaster");  
     //初始化SparkConf  
-    val conf = new SparkConf().setMaster("spark://192.168.1.187:7077").setAppName("build index ");  
+    //val conf = new SparkConf().setMaster("spark://192.168.1.187:7077").setAppName("build index ");  
     //上传运行时依赖的jar包  
-    val seq = Seq(jarPath) :+ "D:\\tmp\\lib\\noggit-0.6.jar" :+ "D:\\tmp\\lib\\httpclient-4.3.1.jar" :+ "D:\\tmp\\lib\\httpcore-4.3.jar" :+ "D:\\tmp\\lib\\solr-solrj-5.1.0.jar" :+ "D:\\tmp\\lib\\httpmime-4.3.1.jar"  
-    conf.setJars(seq)  
+    //val seq = Seq(jarPath) :+ "D:\\tmp\\lib\\noggit-0.6.jar" :+ "D:\\tmp\\lib\\httpclient-4.3.1.jar" :+ "D:\\tmp\\lib\\httpcore-4.3.jar" :+ "D:\\tmp\\lib\\solr-solrj-5.1.0.jar" :+ "D:\\tmp\\lib\\httpmime-4.3.1.jar"  
+    //conf.setJars(seq)  
     //初始化SparkContext上下文  
-    val sc = new SparkContext(conf);  
+    //val sc = new SparkContext(conf);  
     //此目录下所有的数据，将会被构建索引,格式一定是约定好的  
-    val rdd = sc.textFile("hdfs://192.168.1.187:9000/user/monitor/gs/");  
+    //val rdd = sc.textFile("hdfs://192.168.1.187:9000/user/monitor/gs/"); 
+      val conf = new SparkConf().setAppName("YZSUN")
+    val sc = new SparkContext(conf)
+   //val RDD_id = sc.textFile("/user/yzsun/11-15-pushData/finace_data_result_new_1111511232895074/")
+   val RDD_id_juchao = sc.textFile("/user/yzsun/11-15-pushData/merge_data_result_new1511248379785/")
+  //val RDD_id_juchao = sc.textFile("C:/Users/yzsun.abcft/Desktop/test_spark_index.txt")
+   val rdd_juchao = RDD_id_juchao.map{
+        row =>
+          {
+            val row1 = row.substring(1, row.length()-1)
+            val arr1 = row1.split(",")
+            val table_id = "jc_"+arr1(0).trim()
+            /*val arr1_1_int = arr1_1.indexOf("_")
+            val table_id = "jc_"+arr1_1.substring(0, arr1_1_int)*/
+            val table_title = arr1(1)
+            val table_data_hash = arr1(2)
+            val table_row_title = arr1(3)
+            val table_column_title = arr1(4)
+            val table_source="juchao_tables"
+            (table_id+","+table_title+","+table_data_hash+","+table_row_title+","+table_column_title+","+table_source)
+          }
+      }
+   
+   
+   
+   
+   //finace表RDD处理
+    /*val rdd = RDD_id.map{
+        x =>
+          {
+         val data_arr_1 = ArrayBuffer[String]()
+         if (x.length()>60)
+         {
+         val y= x.substring(12, x.length()-1)
+         val yy = y.split(",")
+          
+         if (yy.length ==9)
+         {
+           
+           for (i <- 0 until yy.length)
+           {
+             data_arr_1 += yy(i)
+           }
+         }
+         else if (yy.length >9)
+         {
+           val aa = yy.length -9
+           data_arr_1 += "5881ec69cafd5b13a90f3139"
+           data_arr_1 += "jc_5881ec69cafd5b13a90f3139"
+          for ( i <- 0 until 6)
+           {
+             data_arr_1 += "errordata"
+           }
+           data_arr_1 += "1480089600"
+         }
+           else if (yy.length < 9)
+         {
+             val aa = 9- yy.length
+           for (i <- 0 until yy.length)
+           {
+             data_arr_1 += yy(i)
+           }
+           for ( i <- 0 until aa-1)
+           {
+             data_arr_1 += "errordata"
+           }
+           data_arr_1 += "1483027200"
+         }
+         }
+         else
+         {
+           val ss = "5881ec69cafd5b13a90f3138, jc_5881ec69cafd5b13a90f3138, jc_1202851341, 第十届监事会第六次（临时）会议决议公告, 监事会公告, 全新好, 000007, 住宿和餐饮业, 1480521600"
+         val s1 = ss.split(",")
+         for (i <- 0 until s1.length)
+         {
+           data_arr_1 += s1(i)
+         }
+         }
+           val yy1 = data_arr_1.toString()
+           val yy2 = yy1.substring(12, yy1.length()-1)
+            yy2
+          }
+      }*/
     //通过rdd构建索引  
-    indexRDD(rdd);  
+    indexRDD(rdd_juchao);  
     //关闭索引资源  
     client.close();  
+    print("success")
     //关闭SparkContext上下文  
     sc.stop();  
   

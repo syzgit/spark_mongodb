@@ -11,7 +11,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 object GetDada {
   def main(args:Array[String])={
       def main(args:Array[String]){
-      val conf = new SparkConf().setAppName("yzsun_in_mongo")
+      val conf = new SparkConf().setAppName("yzsun")
 
     val sc = new SparkContext(conf)
 
@@ -28,10 +28,10 @@ object GetDada {
 
    // config.set("mongo.output.uri", "mongodb://spider:Serwe-8dfgre@120.26.41.22:27017/cr_data.table_external_info")
     //config.set("mongo.job.input.format", "com.mongodb.hadoop.BSONFileInputFormat");
-  config.set("mongo.input.query", "$or: [ {'state': 0},{'state': 2}]")
+ // config.set("mongo.input.query", "$or: [ {'state': 0},{'state': 2}]")
     //config.set("mongo.input.query", "{[$and:{'state':4}]}")
-   //config.set("mongo.input.query","{'state':1}")
-    config.set("mongo.input.fields", """{'_id':1,'title':1,'data':1}""")
+   config.set("mongo.input.query","{'state':0}")
+    config.set("mongo.input.fields", """{'title':1,'data':1,'rowCount':1,'columnCount':1}""")
     //config.set("mongo.input.fields", """{'product_1':1}""")
     val documentRDD = sc.newAPIHadoopRDD(
       config,
@@ -45,7 +45,7 @@ object GetDada {
     config)*/
     //print( bsonRDD.count()+"---------------------------------------------------------")
     
-    documentRDD.saveAsTextFile("/user/yzsun/11-15-pushData/juchao_state_data")
+    documentRDD.saveAsTextFile("/user/yzsun/11-15-pushData/juchao_state_data"+System.currentTimeMillis())
     //    RDD data is a KV pair,so it can use saveAsNewAPIHadoopFile
     //rdd.saveAsNewAPIHadoopFile("file:///bogus", classOf[Any], classOf[Any], classOf[com.mongodb.hadoop.MongoOutputFormat[Any, Any]], config)
       sc.stop()

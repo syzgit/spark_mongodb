@@ -65,55 +65,6 @@ val RDD = sc.textFile("/user/yzsun/10-month/juchao_pipei_result/*").map { x =>
        }
          val splits1 =  splist2.slice(4, splits.length-1)
           obj.append("products",splits1)
-          //按字符串形式存入
-            /*for (i <- 0 until splits.length)
-            {
-              if (i ==4 && i != splits.length-1)
-              {
-                obj.put("product_1",splits(i).trim())
-              }
-               if (i ==5 && i != splits.length-1)
-              {
-                obj.put("product_2",splits(i).trim())
-              }
-                if (i ==6 && i != splits.length-1)
-              {
-                obj.put("product_3",splits(i).trim())
-              }
-                 if (i ==7 && i != splits.length-1 )
-              {
-                obj.put("product_4",splits(i).trim())
-              }
-                  if (i ==8 && i != splits.length-1 )
-              {
-                obj.put("product_5",splits(i).trim())
-              }
-                  if (i ==9 && i != splits.length-1)
-              {
-                obj.put("product_6",splits(i).trim())
-              }
-                       if (i ==10 && i != splits.length-1)
-              {
-                obj.put("product_7",splits(i).trim())
-              }
-                        if (i ==11 && i != splits.length-1)
-              {
-                obj.put("product_8",splits(i).trim())
-              }
-                        if (i ==12 && i != splits.length-1)
-              {
-                obj.put("product_9",splits(i).trim())
-              }
-                        if (i ==13 && i != splits.length-1)
-              {
-                obj.put("product_10",splits(i).trim())
-              }
-                        if (i ==14 && i != splits.length-1)
-              {
-                obj.put("product_11",splits(i).trim())
-              }
-            }*/
-        
         obj.put("classify_type",splits(splits.length-1).trim())
        (null, obj)
       }

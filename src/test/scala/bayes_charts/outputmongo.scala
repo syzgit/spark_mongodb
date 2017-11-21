@@ -26,14 +26,14 @@ object outputmongo {
    // config.set("mongo.input.fields", """{"_id_":1, "classify_type":1}""")
    config.set("mongo.auth.uri", sURI)
     config.set("mongo.input.noTimeout", "true")
-    //config.set("mongo.input.query", "{'table_version' : { $gt: 14}}")  //当全部导出的时候不需要加这句话
+    //config.set("mongo.input.query", "{'state' : { "$gte":0,"$lt":1}}")  //当全部导出的时候不需要加这句话
 
    // config.set("mongo.output.uri", "mongodb://spider:Serwe-8dfgre@120.26.41.22:27017/cr_data.table_external_info")
     //config.set("mongo.job.input.format", "com.mongodb.hadoop.BSONFileInputFormat");
-  config.set("mongo.input.query", "$or: [ {'state': 0},{'state': 2}]")
-    //config.set("mongo.input.query", "{[$and:{'state':4}]}")
-   //config.set("mongo.input.query","{'state':1}")
-   config.set("mongo.input.fields", """{'_id':1,'title':1,'data':1}""")
+  //config.set("mongo.input.query", "$or: [ {'state': 0},{'state': 2}]")
+    //config.set("mongo.input.query", "{[$and:{'export_version':6}]}")
+   //config.set("mongo.input.query","{'state':2}")
+   config.set("mongo.input.fields", """{'title':1,'data':1,'rowCount':1,'columnCount':1}""")
     //config.set("mongo.input.fields", """{'src_id':1,'title':1,'type':1,'stock_name':1,'stock_code':1,'industry':1,'time':1}""")
     //config.set("mongo.input.fields", """{'product_1':1}""")
     val documentRDD = sc.newAPIHadoopRDD(
@@ -48,7 +48,7 @@ object outputmongo {
     config)*/
     //print( bsonRDD.count()+"---------------------------------------------------------")
     
-    documentRDD.saveAsTextFile("/user/yzsun/11-15-pushData/juchao_state_data1"+System.currentTimeMillis())
+    documentRDD.saveAsTextFile("/user/yzsun/11-15-pushData/juchao_state_data_state_all")
     //    RDD data is a KV pair,so it can use saveAsNewAPIHadoopFile
     //rdd.saveAsNewAPIHadoopFile("file:///bogus", classOf[Any], classOf[Any], classOf[com.mongodb.hadoop.MongoOutputFormat[Any, Any]], config)
       sc.stop()

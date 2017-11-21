@@ -358,7 +358,7 @@ uplist.foreach{
 
 
   //AArdd.sortByKey().collect().foreach{println}
-//AArdd.repartition(1).saveAsTextFile("/user/yzsun/test00"+System.currentTimeMillis())
+AArdd.repartition(1).saveAsTextFile("/user/yzsun/test00"+System.currentTimeMillis())
    
   sc.stop() 
   }
