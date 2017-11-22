@@ -99,7 +99,7 @@ object pipei {
    
     /*val RDD_id_jiexi_dd_arr =  RDD_id_jiexi_dd.toArray()
    for (i <- 0 until RDD_id_jiexi_dd_arr.length)print(RDD_id_jiexi_dd_arr(i))*/
-   RDD_id_jiexi.repartition(1).saveAsTextFile("/user/yzsun/11-15-pushData/merge_data_result_new"+System.currentTimeMillis())
+   RDD_id_jiexi.saveAsTextFile("/user/yzsun/11-15-pushData/merge_data_result_new"+System.currentTimeMillis())
    
      sc.stop()
   }
@@ -123,7 +123,7 @@ object pipei {
   
   
   
-  
+  /*
   def juchao(RDD_id: RDD[String]):RDD[(String, String, ArrayBuffer[String], ArrayBuffer[String])]=
   {
     val RDD_id_jiexi =  RDD_id.map{
@@ -223,14 +223,14 @@ object pipei {
        
    }
 
-/*for (i <- 0 until RDD_fin_data_arr.length)
+for (i <- 0 until RDD_fin_data_arr.length)
 {
   print(RDD_fin_data_arr(i))
-}*/
+}
 RDD_fin_data
     
-  }
-  def mergedata (RDD_id_jiexi: RDD[(String, String, ArrayBuffer[String], ArrayBuffer[String])],RDD_fin_data: RDD[(String, String, String, String, String, String)])={
+  }*/
+  /*def mergedata (RDD_id_jiexi: RDD[(String, String, ArrayBuffer[String], ArrayBuffer[String])],RDD_fin_data: RDD[(String, String, String, String, String, String)])={
     val RDD_fin_data_arr =     RDD_fin_data.toArray()
     val RDD_id_jiexi_dd = RDD_id_jiexi.map{
       row =>
@@ -264,5 +264,5 @@ RDD_fin_data
          
         }
     }
-  }
+  }*/
 }
