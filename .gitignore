@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # use glob syntax.
 syntax: glob
 *.ser
@@ -39,3 +40,7 @@ build.log
 
 #SHITTY output not in target directory
 build.log
+=======
+*.class
+*.log
+>>>>>>> branch 'master' of https://github.com/syzgit/spark_mongodb.git
