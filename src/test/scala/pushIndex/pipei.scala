@@ -99,7 +99,7 @@ object pipei {
    
     /*val RDD_id_jiexi_dd_arr =  RDD_id_jiexi_dd.toArray()
    for (i <- 0 until RDD_id_jiexi_dd_arr.length)print(RDD_id_jiexi_dd_arr(i))*/
-   RDD_id_jiexi.saveAsTextFile("/user/yzsun/11-15-pushData/merge_data_result_new"+System.currentTimeMillis())
+   RDD_id_jiexi.saveAsTextFile("/user/yzsun/11-15-pushData/merge_data_result_new_23_"+System.currentTimeMillis())
    
      sc.stop()
   }

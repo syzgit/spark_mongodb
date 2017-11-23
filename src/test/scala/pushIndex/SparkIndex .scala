@@ -29,7 +29,7 @@ case class Record(
 object SparkIndex  {
   //solr客户端  
   val httpClient = new SystemDefaultHttpClient();
-val client = new HttpSolrClient("http://10.1.1.248:9081/solr/core_table", httpClient);
+val client = new HttpSolrClient("http://10.1.1.16:8080/solr/core_table", httpClient);
   //val client= new HttpSolrClient("http://10.1.1.248:9081/solr/fin_report");  
   //批提交的条数  
   val batchCount=10000;  
@@ -156,7 +156,7 @@ val client = new HttpSolrClient("http://10.1.1.248:9081/solr/core_table", httpCl
       val conf = new SparkConf().setAppName("YZSUN")
     val sc = new SparkContext(conf)
    //val RDD_id = sc.textFile("/user/yzsun/11-15-pushData/finace_data_result_new_1111511232895074/")
-   val RDD_id_juchao = sc.textFile("/user/yzsun/11-15-pushData/merge_data_result_new1511248379785/")
+   val RDD_id_juchao = sc.textFile("/user/yzsun/11-15-pushData/merge_data_result_new_23_1511401330846/*")
   //val RDD_id_juchao = sc.textFile("C:/Users/yzsun.abcft/Desktop/test_spark_index.txt")
    val rdd_juchao = RDD_id_juchao.map{
         row =>
