@@ -14,6 +14,22 @@ object json_jiexi {
     val data_before_arr_3 = ArrayBuffer[String]()
     data_before_arr_1 += json1.getString("_id")
     data_before_arr_1 += json1.getString("title")
+    val stri11 = "中国"
+     val data_before_arr_6 = ArrayBuffer[String]()
+  for (i <- 0 until stri11.length) {
+        val ch = stri11.charAt(i);
+        //print(stri11.charAt(i))
+        // Strip all non-characters http://unicode.org/cldr/utility/list-unicodeset.jsp?a=[:Noncharacter_Code_Point=True:]
+        // and non-printable control characters except tabulator, new line and carriage return
+        if (ch % 0x10000 != 0xffff && // 0xffff - 0x10ffff range step 0x10000
+          ch % 0x10000 != 0xfffe && // 0xfffe - 0x10fffe range
+          (ch <= 0xfdd0 || ch >= 0xfdef) && // 0xfdd0 - 0xfdef
+          (ch > 0x1F || ch == 0x9 || ch == 0xa || ch == 0xd)) {
+          data_before_arr_6 +=ch.toString()
+          //print(ch)
+        }
+      }
+    for (i <- 0 until data_before_arr_6.length)print(data_before_arr_6(i))
    if (json1.getJSONObject("data").get("row").equals(0))
     {
       data_before_arr_2 += json1.getJSONObject("data").get("text").toString()

@@ -8,28 +8,43 @@ import scala.annotation.meta.field
 import org.apache.http.impl.client.SystemDefaultHttpClient
 import scala.collection.mutable.ArrayBuffer
 case class Record(  
-                //(table_id+","+table_title+","+table_data_hash+","+table_row_title+","+table_column_title+","+table_source)
-                    @(Field@field)("id") id:String,
-                   @(Field@field)("table_title") table_title:String,
-                   @(Field@field)("table_data_hash")  table_data_hash:String,  
-                   @(Field@field)("table_row_title") table_row_title:String,  
-                   @(Field@field)("table_column_title") table_column_title:String,  
-                   @(Field@field)("table_source") table_source:String 
-                  /* @(Field@field)("table_id") table_id:String,
+           /* val id = arr1(0)
+            val table_id = arr1(1)
+            val src_id = arr1(2)
+            val table_title = chid333
+            val table_source=arr1(4)
+            val table_data_hash = arr1(5)
+            val title = chtitle666
+            val stockcode =arr1(7)
+            val company = arr1(8)
+            val $type= arr1(9)
+            val time = arr1(10)
+            val industry_name = arr1(11)
+            val author =arr1(12)
+            val table_row_title = chhash131313
+            val table_column_title = chrow141414*/
                    @(Field@field)("id") id:String,
-                   @(Field@field)("src_id")  src_id:String,  
-                   @(Field@field)("title") title:String,  
-                   @(Field@field)("type")$type:String,  
-                   @(Field@field)("company") company:String,  
-                   @(Field@field)("stockcode")stockcode:String,
-                   @(Field@field)("industry_name") industry_name:String,
-                   @(Field@field)("time") time:String*/
+                   @(Field@field)("table_id") table_id:String,
+                   @(Field@field)("src_id") src_id:String,
+                   @(Field@field)("table_title")  table_title:String,  
+                   @(Field@field)("table_source") table_source:String,  
+                   @(Field@field)("table_data_hash") table_data_hash:String,  
+                   @(Field@field)("title") title:String,
+                   @(Field@field)("stockcode") stockcode:String,  
+                   @(Field@field)("company") company:String,
+                   @(Field@field)("type")  $type:String,  
+                   @(Field@field)("time") time:String,  
+                   @(Field@field)("industry_name")industry_name:String,  
+                   @(Field@field)("author") author:String,  
+                   @(Field@field)("table_row_title")table_row_title:String,
+                   @(Field@field)("table_column_title") table_column_title:String
+                 
                   
                  )  
 object SparkIndex  {
   //solr客户端  
   val httpClient = new SystemDefaultHttpClient();
-val client = new HttpSolrClient("http://10.1.1.16:8080/solr/core_table", httpClient);
+val client = new HttpSolrClient("http://10.11.255.126:8983/solr/core_table", httpClient);
   //val client= new HttpSolrClient("http://10.1.1.248:9081/solr/fin_report");  
   //批提交的条数  
   val batchCount=10000;  
@@ -87,13 +102,14 @@ val client = new HttpSolrClient("http://10.1.1.16:8080/solr/core_table", httpCli
     */  
   def indexLineToModel(line:String,datas:util.ArrayList[Record]): Unit ={  
     //数组数据清洗转换  
-    val fields=line.split(",").map(fields=>fields.trim())//.map(field =>etl_field(field))  
+    val fields=line.split(",").map(row=>row.trim()).map(field =>etl_field(field))
     //将清洗完后的数组映射成Tuple类型  
     val tuple=buildTuble(fields)  
     //将Tuple转换成Bean类型  
-    val recoder=Record.tupled(tuple)  
+    val recoder=Record.tupled(tuple)   
     //将实体类添加至集合，方便批处理提交  
     datas.add(recoder);  
+    //datas.replaceAll(re)
     //提交索引到solr  
     commitSolr(datas,false);  
   }  
@@ -104,9 +120,9 @@ val client = new HttpSolrClient("http://10.1.1.16:8080/solr/core_table", httpCli
     * @param array field集合数组 
     * @return tuple集合 
     */  
-  def buildTuble(array: Array[String]):(String, String,String, String, String, String )={  
+  def buildTuble(array: Array[String]):(String, String,String, String, String, String, String, String, String, String, String, String, String, String, String )={  
      array match {  
-       case Array(s1, s2, s3, s4, s5, s6) => (s1, s2, s3, s4, s5, s6)  
+       case Array(s1, s2, s3, s4, s5, s6,s7,s8,s9,s10,s11,s12,s13,s14,s15) => (s1, s2, s3, s4, s5, s6,s7,s8,s9,s10,s11,s12,s13,s14,s15)  
      }  
   }  
   
@@ -121,7 +137,7 @@ val client = new HttpSolrClient("http://10.1.1.16:8080/solr/core_table", httpCli
     */  
   def etl_field(field:String):String={  
     field match {  
-      case "" => "aaa"  
+      case "" => ""  
       case _ => field  
     }  
   }  
@@ -135,6 +151,9 @@ val client = new HttpSolrClient("http://10.1.1.16:8080/solr/core_table", httpCli
     client.commit()  
     println("删除成功!")  
   }  
+ /* def updatesolr(query:String):Unit ={
+    client.
+  }*/
   
   
   def main(args: Array[String]) {  
@@ -153,25 +172,121 @@ val client = new HttpSolrClient("http://10.1.1.16:8080/solr/core_table", httpCli
     //val sc = new SparkContext(conf);  
     //此目录下所有的数据，将会被构建索引,格式一定是约定好的  
     //val rdd = sc.textFile("hdfs://192.168.1.187:9000/user/monitor/gs/"); 
-      val conf = new SparkConf().setAppName("YZSUN")
+      val conf = new SparkConf().setAppName("YZSUN").setMaster("local")
     val sc = new SparkContext(conf)
    //val RDD_id = sc.textFile("/user/yzsun/11-15-pushData/finace_data_result_new_1111511232895074/")
-   val RDD_id_juchao = sc.textFile("/user/yzsun/11-15-pushData/merge_data_result_new_23_1511401330846/*")
-  //val RDD_id_juchao = sc.textFile("C:/Users/yzsun.abcft/Desktop/test_spark_index.txt")
+  //val RDD_id_juchao = sc.textFile("/user/yzsun/11-15-pushData/mrege_result/merge_data_result_00000/")
+  val RDD_id_juchao = sc.textFile("C:/Users/yzsun.abcft/Desktop/part-new")
    val rdd_juchao = RDD_id_juchao.map{
         row =>
           {
-            val row1 = row.substring(1, row.length()-1)
-            val arr1 = row1.split(",")
-            val table_id = "jc_"+arr1(0).trim()
-            /*val arr1_1_int = arr1_1.indexOf("_")
-            val table_id = "jc_"+arr1_1.substring(0, arr1_1_int)*/
-            val table_title = arr1(1)
-            val table_data_hash = arr1(2)
-            val table_row_title = arr1(3)
-            val table_column_title = arr1(4)
+            val data_before_arr_2 = ArrayBuffer[String]()
+            val arr1 = row.split(",")
+             if (arr1.length !=15 || arr1(3).length()>80 || arr1(6).length()>220  || arr1(13).length()>220 || arr1(14).length()>220)
+            {
+            val id = arr1(0)
+            val table_id = arr1(1)
+            val src_id = arr1(2)
+            val table_title = "error_data"
             val table_source="juchao_tables"
-            (table_id+","+table_title+","+table_data_hash+","+table_row_title+","+table_column_title+","+table_source)
+            val table_data_hash = "-1902946765"
+            val title = "error_data"
+            val stockcode ="error_data"
+            val company = "error_data"
+            val $type= "error_data"
+            val time = "1480089600"
+            val industry_name = "error_data"
+            val author ="error_data"
+            val table_row_title = "error_data"
+            val table_column_title = "error_data"
+            
+             (id+","+table_id+","+src_id+","+table_title+","+table_source+","+table_data_hash+","+title+","+
+                 stockcode+","+company+","+$type+","+time+","+industry_name+","+author+","+table_row_title+","+table_column_title)
+
+            }
+           
+             else
+             {
+                val chid3= ArrayBuffer[String]()
+               for (i <- 0 until arr1(3).length)
+               {
+                  val ch = arr1(3).charAt(i);
+                 
+                 if (ch % 0x10000 != 0xffff && // 0xffff - 0x10ffff range step 0x10000
+          ch % 0x10000 != 0xfffe && // 0xfffe - 0x10fffe range
+          (ch <= 0xfdd0 || ch >= 0xfdef) && // 0xfdd0 - 0xfdef
+          (ch > 0x1F || ch == 0x9 || ch == 0xa || ch == 0xd)) {
+         chid3 +=ch.toString()
+        }
+               }
+               val chtitle6 = ArrayBuffer[String]()
+                for (i <- 0 until arr1(6).length)
+               {
+                  val ch = arr1(6).charAt(i);
+                  
+                 if (ch % 0x10000 != 0xffff && // 0xffff - 0x10ffff range step 0x10000
+          ch % 0x10000 != 0xfffe && // 0xfffe - 0x10fffe range
+          (ch <= 0xfdd0 || ch >= 0xfdef) && // 0xfdd0 - 0xfdef
+          (ch > 0x1F || ch == 0x9 || ch == 0xa || ch == 0xd)) {
+         chtitle6 +=ch.toString()
+        }
+               }
+                val chhash13 = ArrayBuffer[String]()
+                   for (i <- 0 until arr1(13).length)
+               {
+                  val ch = arr1(13).charAt(i);
+                  
+                 if (ch % 0x10000 != 0xffff && // 0xffff - 0x10ffff range step 0x10000
+          ch % 0x10000 != 0xfffe && // 0xfffe - 0x10fffe range
+          (ch <= 0xfdd0 || ch >= 0xfdef) && // 0xfdd0 - 0xfdef
+          (ch > 0x1F || ch == 0x9 || ch == 0xa || ch == 0xd)) {
+         chhash13 +=ch.toString()
+        }
+               }
+                   val chrow14 = ArrayBuffer[String]()
+                      for (i <- 0 until arr1(14).length)
+               {
+                  val ch = arr1(14).charAt(i);
+                  
+                 if (ch % 0x10000 != 0xffff && // 0xffff - 0x10ffff range step 0x10000
+          ch % 0x10000 != 0xfffe && // 0xfffe - 0x10fffe range
+          (ch <= 0xfdd0 || ch >= 0xfdef) && // 0xfdd0 - 0xfdef
+          (ch > 0x1F || ch == 0x9 || ch == 0xa || ch == 0xd)) {
+         chrow14 +=ch.toString()
+        }
+               } 
+      
+              
+                   val chid33 = chid3.toString()
+                   val chtitle66= chtitle6.toString()
+                   val chhash1313 = chhash13.toString()
+                   val chrow1414 = chrow14.toString()
+            val chid333 = chid33.substring(12, chid33.length()-1).replaceAll(",", "").replaceAll(" ", "")
+            val chtitle666 = chtitle66.substring(12, chtitle66.length()-1).replaceAll(",", "").replaceAll(" ", "")
+           val chhash131313 =chhash1313.substring(12, chhash1313.length()-1).replaceAll(",", "").replaceAll(" ", "")
+             val chrow141414 = chrow1414.substring(12, chrow1414.length()-1).replaceAll(",", "-").replaceAll(" ", "")
+           
+            val id = arr1(0)
+            val table_id = arr1(1)
+            val src_id = arr1(2)
+            val table_title = chid333
+            val table_source=arr1(4)
+            val table_data_hash = arr1(5)
+            val title = chtitle666
+            val stockcode =arr1(7)
+            val company = arr1(8)
+            val $type= arr1(9)
+            val time = arr1(10)
+            val industry_name = arr1(11)
+            val author =arr1(12)
+            val table_row_title = chhash131313
+            val table_column_title = chrow141414
+            
+             (id+","+table_id+","+src_id+","+table_title+","+table_source+","+table_data_hash+","+title+","+
+                 stockcode+","+company+","+$type+","+time+","+industry_name+","+author+","+table_row_title+","+table_column_title)
+             
+
+             }
           }
       }
    
@@ -179,7 +294,7 @@ val client = new HttpSolrClient("http://10.1.1.16:8080/solr/core_table", httpCli
    
    
    //finace表RDD处理
-    /*val rdd = RDD_id.map{
+   /* val rdd = RDD_id.map{
         x =>
           {
          val data_arr_1 = ArrayBuffer[String]()

@@ -88,7 +88,7 @@ object pipei {
           (data_before_arr_1(0).toString(),data_before_arr_1(1).toString(),data_left_hash,str_2,str_3)
          }
      }
-   /* val s =  RDD_id_jiexi.toArray()
+  /*  val s =  RDD_id_jiexi.toArray()
      for (i <- 0 until s.length)
      {
        print(s(i))
@@ -97,9 +97,8 @@ object pipei {
      println("")*/
      
    
-    /*val RDD_id_jiexi_dd_arr =  RDD_id_jiexi_dd.toArray()
-   for (i <- 0 until RDD_id_jiexi_dd_arr.length)print(RDD_id_jiexi_dd_arr(i))*/
-   RDD_id_jiexi.saveAsTextFile("/user/yzsun/11-15-pushData/merge_data_result_new_23_"+System.currentTimeMillis())
+   
+   RDD_id_jiexi.repartition(200).saveAsTextFile("/user/yzsun/11-15-pushData/juchao_result_new_12-1-200-"+System.currentTimeMillis())
    
      sc.stop()
   }
