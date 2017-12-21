@@ -8,7 +8,12 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.spark.{SparkConf, SparkContext}
 import com.mongodb.hadoop.BSONFileInputFormat
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
+import scala.collection.mutable.ArrayBuffer
 object outputmongo {
+   def getValue(dbo: BSONObject, key: String) = {
+    val value = dbo.get(key)
+    if (value eq null) "" else value.asInstanceOf[String]
+  }
       def main(args:Array[String]){
       val conf = new SparkConf().setAppName("yzsun_in_mongo")
 
@@ -33,7 +38,7 @@ object outputmongo {
   //config.set("mongo.input.query", "$or: [ {'state': 0},{'state': 2}]")
     //config.set("mongo.input.query", "{[$and:{'export_version':6}]}")
    //config.set("mongo.input.query","{'state':2}")
-   config.set("mongo.input.fields", """{'title':1,'data':1,'rowCount':1,'columnCount':1}""")
+   config.set("mongo.input.fields", """{'title':1,'data':1}""")
     //config.set("mongo.input.fields", """{'src_id':1,'title':1,'type':1,'stock_name':1,'stock_code':1,'industry':1,'time':1}""")
     //config.set("mongo.input.fields", """{'product_1':1}""")
     val documentRDD = sc.newAPIHadoopRDD(
@@ -41,14 +46,46 @@ object outputmongo {
       classOf[com.mongodb.hadoop.MongoInputFormat],
       classOf[Object],
       classOf[BSONObject])
-    /*val bsonRDD = sc.newAPIHadoopFile(path = "hdfs://nameservice1/user/yzsun/hb_talbes",
-    classOf[BSONFileInputFormat].asSubclass(classOf[FileInputFormat[Object, BSONObject]]),
-    classOf[Object],
-    classOf[BSONObject],
-    config)*/
-    //print( bsonRDD.count()+"---------------------------------------------------------")
+    val userRDD = documentRDD.map { case (_, doc) =>
+      val item_id = getValue(doc, "_id").toString().split("_")(0)
+      val int1 =  getValue(doc, "_id").toString().indexOf("_")
+      val str1 =  getValue(doc, "_id").toString().substring(0, int1)
+      val data_temp = getValue(doc, "data")
+      val table_column_title = ArrayBuffer[String]()
+      val table_row_title = ArrayBuffer[String]()
+      val title_arr = ArrayBuffer[String]()
+      val data_left_arr = data_temp.split("}")
+       val data_before_arr_2 = ArrayBuffer[String]()
+        val data_before_arr_3 = ArrayBuffer[String]()
+      for (i <- 0 until data_left_arr.length)
+          {
+            val data_left_arr_arr = data_left_arr(i).split(",")
+            if (data_left_arr(i).contains("\"row\" : 0") )
+            {
+              val text_data_int = data_left_arr(i).indexOf("text")
+              val text_data = data_left_arr(i).substring(text_data_int+7, data_left_arr(i).length).replace("\"", "")
+              data_before_arr_2 += text_data
+            }
+            if ( data_left_arr(i).contains("\"column\" : 0"))
+            {
+              val text_data_int = data_left_arr(i).indexOf("text")
+              val text_data = data_left_arr(i).substring(text_data_int+7, data_left_arr(i).length).replace("\"", "")
+              data_before_arr_3 += text_data
+            }
+          }
+      val data_before_arr_2_str = data_before_arr_2.toString().replaceAll(",", "")
+          val data_before_arr_3_str = data_before_arr_3.toString().replaceAll(",", "")
+          val str_2 = data_before_arr_2_str.substring(12, data_before_arr_2_str.length()-1)
+          val str_3 = data_before_arr_3_str.substring(12, data_before_arr_3_str.length()-1)
+     val table_row_title_str_hash = str_2.hashCode()
+      val table_column_title_hash = str_3.hashCode()
+      val data_temp_hash = data_temp.hashCode()
+      
+      val title_str = getValue(doc, "title").toString()
+     (str1,getValue(doc, "_id").toString,title_str.replaceAll(",", ""),str_2,table_row_title_str_hash,str_3,table_column_title_hash,data_temp_hash)
+    }
     
-    documentRDD.saveAsTextFile("/user/yzsun/11-15-pushData/juchao_state_data_state_all")
+    userRDD.saveAsTextFile("/user/yzsun/11-15-pushData/all_juchao_data/new_juchao_all_data_xianxia")
     //    RDD data is a KV pair,so it can use saveAsNewAPIHadoopFile
     //rdd.saveAsNewAPIHadoopFile("file:///bogus", classOf[Any], classOf[Any], classOf[com.mongodb.hadoop.MongoOutputFormat[Any, Any]], config)
       sc.stop()

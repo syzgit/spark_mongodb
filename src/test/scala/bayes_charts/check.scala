@@ -37,7 +37,8 @@ object check {
   .textFile("/user/yzsun/part-00000/")
  //.map(row=> row.substring(5, row.length()-1).replace("-", "").split(">"))
   srcRDD.take(3).foreach(println)*/
-     
+    val str11 = "SolrDocument{id=sc_58889157077a8b26d9db2ea9_10_0}"
+   print(str11.subSequence(16, str11.length()-1))
      val aa="123adfas8f9f"
      val a =3.0
      if (a >2){

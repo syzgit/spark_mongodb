@@ -81,14 +81,17 @@ object pipei {
               data_before_arr_3 += text_data
             }
           }
+          val data_before_id = data_before_arr_1(0).toString()
+          val fake_id_first = data_before_id.indexOf("_")
+          val fake_id = data_before_id.substring(0, fake_id_first)
           val data_before_arr_2_str = data_before_arr_2.toString().replaceAll(",", "")
           val data_before_arr_3_str = data_before_arr_3.toString().replaceAll(",", "")
           val str_2 = data_before_arr_2_str.substring(12, data_before_arr_2_str.length()-1)
           val str_3 = data_before_arr_3_str.substring(12, data_before_arr_3_str.length()-1)
-          (data_before_arr_1(0).toString(),data_before_arr_1(1).toString(),data_left_hash,str_2,str_3)
+          (data_before_id,fake_id,data_before_arr_1(1).toString(),data_left_hash,str_2,str_3)
          }
      }
-  /*  val s =  RDD_id_jiexi.toArray()
+   /* val s =  RDD_id_jiexi.toArray()
      for (i <- 0 until s.length)
      {
        print(s(i))
@@ -98,7 +101,7 @@ object pipei {
      
    
    
-   RDD_id_jiexi.repartition(200).saveAsTextFile("/user/yzsun/11-15-pushData/juchao_result_new_12-1-200-"+System.currentTimeMillis())
+  RDD_id_jiexi.repartition(5).saveAsTextFile("/user/yzsun/11-15-pushData/juchao_result_new_12-8-10-"+System.currentTimeMillis())
    
      sc.stop()
   }

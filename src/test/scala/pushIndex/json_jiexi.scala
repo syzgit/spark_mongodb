@@ -16,7 +16,9 @@ object json_jiexi {
     data_before_arr_1 += json1.getString("title")
     val stri11 = "中国"
      val data_before_arr_6 = ArrayBuffer[String]()
-  for (i <- 0 until stri11.length) {
+     val atest = "000"
+     print("atest||"+atest.substring(0, atest.length()-3)+"||")
+  /*for (i <- 0 until stri11.length) {
         val ch = stri11.charAt(i);
         //print(stri11.charAt(i))
         // Strip all non-characters http://unicode.org/cldr/utility/list-unicodeset.jsp?a=[:Noncharacter_Code_Point=True:]
@@ -44,7 +46,7 @@ object json_jiexi {
     for (i <- 0 until data_before_arr_4.length)print(data_before_arr_4(i))
    val s1 = str2.indexOf("src_id")
     val str4 = str2.substring(s1-2, str2.length)
-    print(str4)
+    print(str4)*/
     val json=JSON.parseObject(str3)
        //获取成员
       // val fet=json.get("et")
@@ -55,8 +57,8 @@ object json_jiexi {
        val vtm=json.getInteger("vtm")
        //println(vtm)
        //返回多级成员
-       val client=json.getJSONObject("time").get("$date")
-       println(client)
+       val client=json.getJSONObject("time")
+       println("datadata-------------------"+client)
 
   }
 }

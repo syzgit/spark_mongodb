@@ -39,7 +39,7 @@ object finace_data_jiexi {
      Logger.getLogger("org").setLevel(Level.ERROR)
       val conf = new SparkConf().setAppName("YZSUN")
     val sc = new SparkContext(conf)
-    val RDD_fin = sc.textFile("/user/yzsun/11-15-pushData/finace_item_juchao/")
+    val RDD_fin = sc.textFile("D:/BaiduNetdiskDownload/finace_data/*")
     //val RDD_fin = sc.textFile("C:/Users/yzsun.abcft/Desktop/data_fiance.txt")
     val RDD_fin_data =  RDD_fin.map{
      row =>
@@ -50,7 +50,7 @@ object finace_data_jiexi {
         val row2 =  row1.substring(int1+1, row.length-1)
          val json=JSON.parseObject(row2)
          data_before_arr_1 +=json.getJSONObject("_id").get("$oid").toString().replaceAll(",", " ")
-         data_before_arr_1 += ("jc_"++json.getJSONObject("_id").get("$oid").toString())
+         data_before_arr_1 += ("sc_"++json.getJSONObject("_id").get("$oid").toString())
          data_before_arr_1 += json.getString("src_id").replaceAll(",", " ")
          if (json.getString("title")==null)
          {
@@ -135,7 +135,7 @@ object finace_data_jiexi {
    }*/
   /* val s =  RDD_fin_data.toArray()
      for (i <- 0 until s.length)print(s(i))*/
-    RDD_fin_data.saveAsTextFile("/user/yzsun/11-15-pushData/finace_data_result_new_111"+System.currentTimeMillis())
+    RDD_fin_data.repartition(1).saveAsTextFile("/user/yzsun/11-15-pushData/finace_data_result_new_111"+System.currentTimeMillis())
 
    sc.stop()
   }
